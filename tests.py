@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 import numpy as np
 
-from commands.move import Move, IMovable
-from commands.rotate import Rotate, IRotatable
+from commands import Move, Rotate
+from interfaces import IMovable, IRotatable
 
 
 class TestMove(TestCase):
