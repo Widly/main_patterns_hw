@@ -3,6 +3,12 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
+class ICommand(ABC):
+    @abstractmethod
+    def execute(self) -> None:
+        ...
+
+
 class IMovable(ABC):
     @abstractmethod
     def get_position(self) -> np.array:

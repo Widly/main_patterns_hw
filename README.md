@@ -1,1 +1,1 @@
-OTUS HW №2
+OTUS HW
