@@ -9,6 +9,7 @@ db.sqlite3
 # Distribution / packaging
 .Python
 env/
+venv/
 build/
 develop-eggs/
 dist/
