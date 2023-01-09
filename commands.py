@@ -4,8 +4,10 @@ from typing import Union
 
 import numpy as np
 
+from event_loop import CommandExecutorThread
 from exceptions import CommandException
 from interfaces import ICommand, IMovable, IRotatable, IFuelable, IVelocityChangeable
+from iocs import IoC
 
 
 class MacroCommand(ICommand):
@@ -119,3 +121,32 @@ class RotateWithChangeVelocity(ICommand):
             Rotate(self.obj),
             ChangeVelocity(self.obj)
         ]).execute()
+
+
+class StartThreadCommand(ICommand):
+    """
+    Команда запускает поток CommandExecutorThread
+    """
+    def execute(self) -> None:
+        parent_scope = IoC.resolve('Scopes.Current')
+        thread = CommandExecutorThread(parent_scope=parent_scope, daemon=True)
+        IoC.resolve('IoC.Register', 'Thread', lambda: thread).execute()
+        thread.start()
+
+
+class HardStopThreadCommand(ICommand):
+    """
+    Команда осуществляет Hard Stop потока CommandExecutorThread
+    """
+
+    def execute(self) -> None:
+        IoC.resolve('IoC.Register', 'Thread.HardStop', lambda: True).execute()
+
+
+class SoftStopThreadCommand(ICommand):
+    """
+    Команда осуществляет Soft Stop потока CommandExecutorThread
+    """
+
+    def execute(self) -> None:
+        IoC.resolve('IoC.Register', 'Thread.SoftStop', lambda: True).execute()
