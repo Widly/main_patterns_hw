@@ -39,7 +39,7 @@ class CommandExecutorThread(Thread):
 
         while True:
             if self.hard_stop:
-                # В случае Hard Stop сразу выходим из цикла - поток заверщается
+                # В случае Hard Stop сразу выходим из цикла - поток завершается
                 break
 
             if self.soft_stop:
