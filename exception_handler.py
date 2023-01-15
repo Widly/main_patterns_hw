@@ -1,6 +1,6 @@
 from typing import Type
 
-from commands import ICommand
+from features.base.interfaces import ICommand
 
 
 class ExceptionHandler:

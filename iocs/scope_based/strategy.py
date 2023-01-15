@@ -1,6 +1,6 @@
 import threading
 
-from interfaces import ICommand
+from features.base.interfaces import ICommand
 from iocs.base import IoC
 
 

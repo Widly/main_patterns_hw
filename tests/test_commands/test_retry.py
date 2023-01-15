@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from interfaces import ICommand
-from commands import Retry
+from features.base.interfaces import ICommand
+from features.service.commands import Retry
 
 
 class TestRetry(TestCase):

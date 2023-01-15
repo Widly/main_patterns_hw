@@ -1,4 +1,4 @@
-from interfaces import ICommand
+from features.base.interfaces import ICommand
 
 
 class IoC:

@@ -2,8 +2,7 @@ from threading import Thread
 from unittest import TestCase
 
 from iocs import IoC
-from iocs.scope_based import InitScopesCommand
-from iocs.scope_based import Scope
+from iocs.scope_based.strategy import Scope, InitScopesCommand
 
 
 class PropagateExceptionThread(Thread):

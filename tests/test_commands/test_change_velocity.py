@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 import numpy as np
 
-from commands import ChangeVelocity
-from interfaces import IVelocityChangeable
+from features.rotation.commands import ChangeVelocity
+from features.rotation.interfaces import IVelocityChangeable
 
 
 class TestChangeVelocity(TestCase):

@@ -1,9 +1,9 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from commands import CheckFuel, BurnFuel
+from features.movement.commands import CheckFuel, BurnFuel
 from exceptions import CommandException
-from interfaces import IFuelable
+from features.movement.interfaces import IFuelable
 
 
 class TestCheckFuel(TestCase):

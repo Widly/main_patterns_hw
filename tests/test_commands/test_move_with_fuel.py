@@ -3,9 +3,9 @@ from unittest.mock import Mock
 
 import numpy as np
 
-from commands import MoveWithFuel
+from features.movement.commands import MoveWithFuel
 from exceptions import CommandException
-from interfaces import IFuelable, IMovable
+from features.movement.interfaces import IMovable, IFuelable
 
 
 class TestMoveWithFuel(TestCase):
