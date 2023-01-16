@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from commands import Log
-from interfaces import ICommand
+from features.service.commands import Log
+from features.base.interfaces import ICommand
 
 
 class TestLog(TestCase):

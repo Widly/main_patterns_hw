@@ -3,8 +3,8 @@ from unittest.mock import Mock
 
 import numpy as np
 
-from commands import Move
-from interfaces import IMovable
+from features.movement.commands import Move
+from features.movement.interfaces import IMovable
 
 
 class TestMove(TestCase):

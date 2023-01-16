@@ -3,10 +3,12 @@ from threading import active_count
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from commands import ICommand, StartThreadCommand, HardStopThreadCommand, SoftStopThreadCommand
+from iocs.commands import HardStopThreadCommand, SoftStopThreadCommand
+from iocs.scope_based.commands import StartThreadCommand
+from features.base.interfaces import ICommand
 from exception_handler import ExceptionHandler
 from iocs import IoC
-from iocs.scope_based import InitScopesCommand
+from iocs.scope_based.strategy import InitScopesCommand
 
 
 class TestEventLoop(TestCase):

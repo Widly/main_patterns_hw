@@ -1,9 +1,9 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from commands import MacroCommand
+from features.base.commands import MacroCommand
 from exceptions import CommandException
-from interfaces import ICommand
+from features.base.interfaces import ICommand
 
 
 class TestMacroCommand(TestCase):

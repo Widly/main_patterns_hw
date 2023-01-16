@@ -1,7 +1,8 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from commands import ICommand, Log, Retry, DoubleRetry
+from features.service.commands import Log, Retry, DoubleRetry
+from features.base.interfaces import ICommand
 from exception_handler import ExceptionHandler
 
 

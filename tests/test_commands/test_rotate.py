@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-from commands import Rotate
-from interfaces import IRotatable
+from features.rotation.commands import Rotate
+from features.rotation.interfaces import IRotatable
 
 
 class TestRotate(TestCase):
