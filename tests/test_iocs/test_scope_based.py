@@ -28,6 +28,10 @@ class TestScopeBasedIoC(TestCase):
     def setUpClass(cls) -> None:
         InitScopesCommand().execute()
 
+    @classmethod
+    def tearDownClass(cls) -> None:
+        IoC.resolve('Scopes.Current.Set', IoC.resolve('Scopes.Root')).execute()
+
     def test_root_scope_is_available(self):
         self.assertIsInstance(IoC.resolve('Scopes.Root'), Scope)
 
