@@ -3,9 +3,10 @@ from typing import Union
 
 import numpy as np
 
-from features.base.commands import MacroCommand
+from features.base.commands import MacroCommand, GetProperty, SetProperty
 from features.base.interfaces import ICommand
 from features.rotation.interfaces import IVelocityChangeable, IRotatable
+from iocs import IoC
 
 
 class Rotate(ICommand):
@@ -45,3 +46,63 @@ class RotateWithChangeVelocity(ICommand):
             Rotate(self.obj),
             ChangeVelocity(self.obj)
         ]).execute()
+
+
+class RotateCommandsPluginCommand(ICommand):
+    def execute(self) -> None:
+        # IRotatable
+        IoC.resolve(
+            'IoC.Register',
+            'IRotatable:direction.get',
+            lambda obj: GetProperty(obj, "direction").execute()
+        ).execute()
+
+        IoC.resolve(
+            'IoC.Register',
+            'IRotatable:direction.set',
+            lambda obj, value: SetProperty(obj, "direction", value).execute()
+        ).execute()
+
+        IoC.resolve(
+            'IoC.Register',
+            'IRotatable:angular_velocity.get',
+            lambda obj, value: GetProperty(obj, "angular_velocity")
+        ).execute()
+
+        IoC.resolve(
+            'IoC.Register',
+            'IRotatable:directions_number.get',
+            lambda obj, value: GetProperty(obj, "directions_number")
+        ).execute()
+
+        # IVelocityChangeable
+        IoC.resolve(
+            'IoC.Register',
+            'IVelocityChangeable:velocity.get',
+            lambda obj, value: GetProperty(obj, "velocity")
+        ).execute()
+
+        IoC.resolve(
+            'IoC.Register',
+            'IVelocityChangeable:velocity.set',
+            lambda obj, value: SetProperty(obj, "velocity", value).execute()
+        ).execute()
+
+        IoC.resolve(
+            'IoC.Register',
+            'IVelocityChangeable:angle.get',
+            lambda obj, value: GetProperty(obj, "angle")
+        ).execute()
+
+        # Commands
+        IoC.resolve(
+            'IoC.Register',
+            'Commands.Rotate',
+            lambda obj: Rotate(IoC.resolve("Adapter", IRotatable, obj))
+        ).execute()
+
+        IoC.resolve(
+            'IoC.Register',
+            'Commands.ChangeVelocity',
+            lambda obj: ChangeVelocity(IoC.resolve("Adapter", IVelocityChangeable, obj))
+        ).execute()

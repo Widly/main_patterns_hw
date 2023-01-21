@@ -2,7 +2,7 @@ from threading import Thread
 from unittest import TestCase
 
 from iocs import IoC
-from iocs.scope_based.strategy import Scope, InitScopesCommand
+from iocs.scope_based_strategy import Scope, InitScopesCommand
 
 
 class PropagateExceptionThread(Thread):
@@ -27,9 +27,9 @@ class TestScopeBasedIoC(TestCase):
     def setUpClass(cls) -> None:
         InitScopesCommand().execute()
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        IoC.resolve('Scopes.Current.Set', IoC.resolve('Scopes.Root')).execute()
+    def tearDown(self) -> None:
+        IoC.resolve('Scopes.Current.Set', 'ROOT').execute()
+        IoC.resolve('Scopes.Clear').execute()
 
     def test_root_scope_is_available(self):
         self.assertIsInstance(IoC.resolve('Scopes.Root'), Scope)
@@ -43,21 +43,18 @@ class TestScopeBasedIoC(TestCase):
         self.assertEqual({}, IoC.resolve('Scopes.Storage'))
 
     def test_create_new_scope(self):
-        root_scope = IoC.resolve('Scopes.Root')
-        new_scope = IoC.resolve('Scopes.New', root_scope)
+        new_scope = IoC.resolve('Scopes.New', 'scope-id')
         self.assertIsInstance(new_scope, Scope)
-        self.assertNotEqual(root_scope, new_scope)
+        self.assertNotEqual(IoC.resolve('Scopes.Root'), new_scope)
 
     def test_set_scope(self):
-        root_scope = IoC.resolve('Scopes.Root')
-        new_scope = IoC.resolve('Scopes.New', root_scope)
-        IoC.resolve('Scopes.Current.Set', new_scope).execute()
+        new_scope = IoC.resolve('Scopes.New', 'scope-id')
+        IoC.resolve('Scopes.Current.Set', 'scope-id').execute()
         self.assertEqual(new_scope, IoC.resolve('Scopes.Current'))
 
     def test_register_dependency(self):
-        root_scope = IoC.resolve('Scopes.Root')
-        new_scope = IoC.resolve('Scopes.New', root_scope)
-        IoC.resolve('Scopes.Current.Set', new_scope).execute()
+        IoC.resolve('Scopes.New', 'scope-id')
+        IoC.resolve('Scopes.Current.Set', 'scope-id').execute()
 
         IoC.resolve('IoC.Register', 'dependency', lambda: 1).execute()
         self.assertEqual(1, IoC.resolve('dependency'))
@@ -66,26 +63,24 @@ class TestScopeBasedIoC(TestCase):
             IoC.resolve('IoC.Register', 'dependency', lambda: 2).execute()
 
     def test_resolving_dependency_depends_on_current_scope(self):
-        root_scope = IoC.resolve('Scopes.Root')
-        scope_1 = IoC.resolve('Scopes.New', root_scope)
-        IoC.resolve('Scopes.Current.Set', scope_1).execute()
+        IoC.resolve('Scopes.New', 'scope-id-1')
+        IoC.resolve('Scopes.Current.Set', 'scope-id-1').execute()
 
         IoC.resolve('IoC.Register', 'dependency', lambda: 1).execute()
         self.assertEqual(1, IoC.resolve('dependency'))
 
-        scope_2 = IoC.resolve('Scopes.New', root_scope)
-        IoC.resolve('Scopes.Current.Set', scope_2).execute()
+        IoC.resolve('Scopes.New', 'scope-id-2')
+        IoC.resolve('Scopes.Current.Set', 'scope-id-2').execute()
 
         IoC.resolve('IoC.Register', 'dependency', lambda: 2).execute()
         self.assertEqual(2, IoC.resolve('dependency'))
 
-        IoC.resolve('Scopes.Current.Set', scope_1).execute()
+        IoC.resolve('Scopes.Current.Set', 'scope-id-1').execute()
         self.assertEqual(1, IoC.resolve('dependency'))
 
     def test_resolving_dependency_depends_on_scope_hierarchy(self):
-        root_scope = IoC.resolve('Scopes.Root')
-        scope_1 = IoC.resolve('Scopes.New', root_scope)
-        IoC.resolve('Scopes.Current.Set', scope_1).execute()
+        IoC.resolve('Scopes.New', 'scope-id-1')
+        IoC.resolve('Scopes.Current.Set', 'scope-id-1').execute()
 
         IoC.resolve('IoC.Register', 'dependency_1', lambda: 1).execute()
         self.assertEqual(1, IoC.resolve('dependency_1'))
@@ -93,8 +88,8 @@ class TestScopeBasedIoC(TestCase):
         with self.assertRaisesRegex(Exception, "Unknown dependency 'dependency_2'"):
             IoC.resolve('dependency_2')
 
-        scope_2 = IoC.resolve('Scopes.New', scope_1)
-        IoC.resolve('Scopes.Current.Set', scope_2).execute()
+        IoC.resolve('Scopes.New', 'scope-id-2')
+        IoC.resolve('Scopes.Current.Set', 'scope-id-2').execute()
         IoC.resolve('IoC.Register', 'dependency_2', lambda: 2).execute()
 
         self.assertEqual(1, IoC.resolve('dependency_1'))
@@ -103,19 +98,20 @@ class TestScopeBasedIoC(TestCase):
         IoC.resolve('IoC.Register', 'dependency_1', lambda: 3).execute()
         self.assertEqual(3, IoC.resolve('dependency_1'))
 
-        IoC.resolve('Scopes.Current.Set', scope_1).execute()
+        IoC.resolve('Scopes.Current.Set', 'scope-id-1').execute()
         self.assertEqual(1, IoC.resolve('dependency_1'))
         with self.assertRaisesRegex(Exception, "Unknown dependency 'dependency_2'"):
             IoC.resolve('dependency_2')
 
     def test_multithreading(self):
-        scope = IoC.resolve('Scopes.New', IoC.resolve('Scopes.Root'))
-        IoC.resolve('Scopes.Current.Set', scope).execute()
+        IoC.resolve('Scopes.New', 'parent-scope-id')
+        IoC.resolve('Scopes.Current.Set', 'parent-scope-id').execute()
         IoC.resolve('IoC.Register', 'dependency', lambda: 1).execute()
 
-        def thread_logic(parent_scope, thread_number):
-            thread_scope = IoC.resolve('Scopes.New', parent_scope)
-            IoC.resolve('Scopes.Current.Set', thread_scope).execute()
+        def thread_logic(parent_scope_id, thread_number):
+            scope_id = f'scope-id-{thread_number}'
+            IoC.resolve('Scopes.New', scope_id, parent_scope_id)
+            IoC.resolve('Scopes.Current.Set', scope_id).execute()
             self.assertEqual(1, IoC.resolve('dependency'))  # Проверяем, что можем читать из родительского скоупа
 
             # Проверяем, что каждый поток пользуется своим HierarchicalScopeBasedDependencyStrategy.current_scopes
@@ -125,7 +121,7 @@ class TestScopeBasedIoC(TestCase):
 
         threads = list()
         for i in range(100):
-            thread = PropagateExceptionThread(target=thread_logic, args=(scope, i))
+            thread = PropagateExceptionThread(target=thread_logic, args=('parent-scope-id', i))
             threads.append(thread)
 
         # start threads
