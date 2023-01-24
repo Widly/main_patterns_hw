@@ -61,8 +61,7 @@ if __name__ == '__main__':
         'IoC.Register',
         'Operations.Rotation.Description',
         lambda: [
-            'Commands.Rotate',
-            'Commands.ChangeVelocity'
+            'Commands.Rotate'
         ]
     ).execute()
 

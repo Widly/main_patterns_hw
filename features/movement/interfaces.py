@@ -35,7 +35,7 @@ class IFuelable(ABC):
 
 class IMovementStartable(ABC):
     @abstractmethod
-    def set_velocity(self, v: np.array) -> None:
+    def set_velocity(self, v: int) -> None:
         ...
 
     def get_object(self) -> UObject:

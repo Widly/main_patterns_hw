@@ -60,19 +60,19 @@ class RotateCommandsPluginCommand(ICommand):
         IoC.resolve(
             'IoC.Register',
             'IRotatable:direction.set',
-            lambda obj, value: SetProperty(obj, "direction", value).execute()
+            lambda obj, value: SetProperty(obj, "direction", value)
         ).execute()
 
         IoC.resolve(
             'IoC.Register',
             'IRotatable:angular_velocity.get',
-            lambda obj, value: GetProperty(obj, "angular_velocity")
+            lambda obj: GetProperty(obj, "angular_velocity").execute()
         ).execute()
 
         IoC.resolve(
             'IoC.Register',
             'IRotatable:directions_number.get',
-            lambda obj, value: GetProperty(obj, "directions_number")
+            lambda obj: GetProperty(obj, "directions_number").execute()
         ).execute()
 
         # IVelocityChangeable
@@ -85,7 +85,7 @@ class RotateCommandsPluginCommand(ICommand):
         IoC.resolve(
             'IoC.Register',
             'IVelocityChangeable:velocity.set',
-            lambda obj, value: SetProperty(obj, "velocity", value).execute()
+            lambda obj, value: SetProperty(obj, "velocity", value)
         ).execute()
 
         IoC.resolve(

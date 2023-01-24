@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from exceptions import CommandException
@@ -33,8 +35,8 @@ class BurnFuel(ICommand):
 
 
 class StartMovement(ICommand):
-    def __init__(self, obj: IMovementStartable, initial_velocity: list):
-        self.initial_velocity = np.array(initial_velocity)
+    def __init__(self, obj: IMovementStartable, initial_velocity: int):
+        self.initial_velocity = initial_velocity
         self.obj = obj
 
     def execute(self) -> None:
@@ -58,10 +60,21 @@ class MoveCommandPluginCommand(ICommand):
             lambda obj, value: SetProperty(obj, "position", value)
         ).execute()
 
+        def get_velocity(obj):
+            direction = GetProperty(obj, "direction").execute()
+            directions_number = GetProperty(obj, "directions_number").execute()
+            velocity_modulus = GetProperty(obj, "velocity").execute()
+
+            angle = (2 * math.pi / directions_number) * direction
+            return (np.array([
+                round(velocity_modulus * math.cos(angle)),
+                round(velocity_modulus * math.sin(angle))
+            ]))
+
         IoC.resolve(
             'IoC.Register',
             'IMovable:velocity.get',
-            lambda obj: GetProperty(obj, "velocity").execute()  # здесь может быть другая логика
+            lambda obj: get_velocity(obj)
         ).execute()
 
         IoC.resolve(

@@ -84,6 +84,9 @@ class GameCommand(ICommand):
         obj1.set_property('id', obj1_id)
         obj1.set_property('position', np.array([0, 0]))
         obj1.set_property('fuel_level', 100)
+        obj1.set_property('directions_number', 4)
+        obj1.set_property('direction', 1)
+        obj1.set_property('angular_velocity', 1)
         obj1.set_property('fuel_consumption', 1)
         IoC.resolve('Objects.Add', obj1_id, obj1).execute()
 
@@ -92,6 +95,9 @@ class GameCommand(ICommand):
         obj2.set_property('id', obj2_id)
         obj2.set_property('position', np.array([0, 1000]))
         obj2.set_property('fuel_level', 100)
+        obj2.set_property('directions_number', 4)
+        obj2.set_property('direction', 3)
+        obj2.set_property('angular_velocity', 1)
         obj2.set_property('fuel_consumption', 1)
         IoC.resolve('Objects.Add', obj2_id, obj2).execute()
 
@@ -103,6 +109,10 @@ class GameCommand(ICommand):
             print('\t', f'{obj.get_property("id")}:')
             print('\t\t', f'position: {obj.get_property("position")}')
             print('\t\t', f'fuel_level: {obj.get_property("fuel_level")}')
+            print('\t\t', f'fuel_consumption: {obj.get_property("fuel_consumption")}')
+            print('\t\t', f'direction: {obj.get_property("direction")}')
+            print('\t\t', f'directions_number: {obj.get_property("directions_number")}')
+            print('\t\t', f'angular_velocity: {obj.get_property("angular_velocity")}')
         print()
 
         try:
