@@ -64,9 +64,6 @@ class StartThreadCommand(ICommand):
         ).execute()
 
         def run():
-            # Инициализация скоупа данного потока
-            IoC.resolve('Scopes.Current.Set', self.thread_id).execute()
-
             while True:
                 if self._hard_stop:
                     # В случае Hard Stop сразу выходим из цикла - поток завершается
@@ -81,6 +78,9 @@ class StartThreadCommand(ICommand):
                 else:
                     # Обычный режим работы потока - ожидаем команды из очереди
                     cmd = q.get()
+
+                # Инициализация скоупа данного потока
+                IoC.resolve('Scopes.Current.Set', self.thread_id).execute()
 
                 try:
                     cmd.execute()

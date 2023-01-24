@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from features.base.interfaces import UObject
+
 
 class IMovable(ABC):
     @abstractmethod
@@ -28,4 +30,13 @@ class IFuelable(ABC):
 
     @abstractmethod
     def get_fuel_consumption(self) -> int:
+        ...
+
+
+class IMovementStartable(ABC):
+    @abstractmethod
+    def set_velocity(self, v: np.array) -> None:
+        ...
+
+    def get_object(self) -> UObject:
         ...
