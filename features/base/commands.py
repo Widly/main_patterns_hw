@@ -3,7 +3,7 @@ from typing import Iterable
 
 from exceptions import CommandException
 from iocs import IoC
-from .interfaces import ICommand
+from .interfaces import ICommand, UObject
 
 
 class MacroCommand(ICommand):
@@ -16,6 +16,33 @@ class MacroCommand(ICommand):
                 cmd.execute()
         except Exception as e:
             raise CommandException(e)
+
+
+class GetProperty(ICommand):
+    def __init__(self, obj: UObject, key: str):
+        self.obj = obj
+        self.key = key
+
+    def execute(self) -> object:
+        return self.obj.get_property(self.key)
+
+
+class SetProperty(ICommand):
+    def __init__(self, obj: UObject, key: str, value: object):
+        self.obj = obj
+        self.key = key
+        self.value = value
+
+    def execute(self) -> None:
+        self.obj.set_property(self.key, self.value)
+
+
+class LambdaCommand(ICommand):
+    def __init__(self, action):
+        self.action = action
+
+    def execute(self) -> None:
+        self.action()
 
 
 class CreateAdapterException(Exception):

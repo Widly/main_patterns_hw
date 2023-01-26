@@ -1,11 +1,13 @@
 import threading
 
+from features.base.commands import LambdaCommand
 from features.base.interfaces import ICommand
 from iocs.base import IoC
 
 
 class Scope:
-    def __init__(self, dependencies, parent=None):
+    def __init__(self, scope_id, dependencies, parent=None):
+        self.id = scope_id
         self.dependencies = dependencies
         self.parent = parent
 
@@ -88,13 +90,41 @@ class InitScopesCommand(ICommand):
         IoC.resolve("IoC.SetupStrategy", HierarchicalScopeBasedDependencyStrategy.resolve).execute()
 
         root_dependencies = {}
-        root_scope = Scope(root_dependencies)
+        root_scope_id = 'ROOT'
+        root_scope = Scope(root_scope_id, root_dependencies)
 
         root_dependencies['Scopes.Storage'] = lambda: {}
-        root_dependencies['Scopes.New'] = lambda parent_scope: Scope(IoC.resolve('Scopes.Storage'), parent_scope)
+
+        scopes = {
+            root_scope_id: root_scope
+        }
+
+        def create_new_scope(scope_id: str, parent_scope_id: str = None):
+
+            if parent_scope_id:
+                parent_scope = scopes.get(parent_scope_id, None)
+            else:
+                parent_scope = IoC.resolve('Scopes.Current')
+
+            if not parent_scope:
+                raise Exception('Cannot identify parent scope!')
+
+            new_scope = Scope(scope_id, IoC.resolve('Scopes.Storage'), parent_scope)
+            if scope_id in scopes:
+                raise Exception(f'Scope with id {scope_id} aleready exists')
+            scopes[scope_id] = new_scope
+            return new_scope
+
+        root_dependencies['Scopes.New'] = create_new_scope
+
+        def clear_scopes():
+            scopes.clear()
+            scopes[root_scope_id] = root_scope
+
+        root_dependencies['Scopes.Clear'] = lambda: LambdaCommand(clear_scopes)
 
         root_dependencies['Scopes.Current'] = HierarchicalScopeBasedDependencyStrategy.get_current_scope
-        root_dependencies['Scopes.Current.Set'] = lambda scope: SetCurrentScopeCommand(scope)
+        root_dependencies['Scopes.Current.Set'] = lambda scope_id: SetCurrentScopeCommand(scopes[scope_id])
 
         root_dependencies['IoC.Register'] = lambda key, strategy: RegisterIoCDependencyCommand(key, strategy)
 

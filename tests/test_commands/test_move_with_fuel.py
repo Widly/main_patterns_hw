@@ -1,11 +1,26 @@
+from typing import Union
 from unittest import TestCase
 from unittest.mock import Mock
 
 import numpy as np
 
-from features.movement.commands import MoveWithFuel
 from exceptions import CommandException
+from features.base.commands import MacroCommand
+from features.base.interfaces import ICommand
+from features.movement.commands import CheckFuel, Move, BurnFuel
 from features.movement.interfaces import IMovable, IFuelable
+
+
+class MoveWithFuel(ICommand):
+    def __init__(self, obj: Union[IMovable, IFuelable]):
+        self.obj = obj
+
+    def execute(self) -> None:
+        MacroCommand([
+            CheckFuel(self.obj),
+            Move(self.obj),
+            BurnFuel(self.obj)
+        ]).execute()
 
 
 class TestMoveWithFuel(TestCase):

@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from features.base.commands import InitCreateCommandAdapterStrategy
 from features.base.interfaces import UObject
 from iocs import IoC
-from iocs.scope_based.strategy import InitScopesCommand
+from iocs.scope_based_strategy import InitScopesCommand
 
 
 class IActionable:
@@ -33,11 +33,15 @@ class TestCreateCommandAdapterStrategy(TestCase):
 
     def setUp(self) -> None:
         # Создаем новый скоуп чтобы не вносить зависимости в Root скоуп
-        scope = IoC.resolve('Scopes.New', IoC.resolve('Scopes.Root'))
-        IoC.resolve('Scopes.Current.Set', scope).execute()
+        IoC.resolve('Scopes.New', 'scope-id')
+        IoC.resolve('Scopes.Current.Set', 'scope-id').execute()
 
         # Инициализация стратегии
         InitCreateCommandAdapterStrategy().execute()
+
+    def tearDown(self) -> None:
+        IoC.resolve('Scopes.Current.Set', 'ROOT').execute()
+        IoC.resolve('Scopes.Clear').execute()
 
     def test_interface_getter_method(self):
         obj = Mock(UObject)
